@@ -2,3 +2,4 @@ flask
 flask-cors
 yt-dlp
 boto3
+ffmpeg-python

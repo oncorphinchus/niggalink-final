@@ -8,6 +8,7 @@ import boto3
 from botocore.exceptions import ClientError
 import tempfile
 import time
+import subprocess
 
 application = Flask(__name__, static_folder='static')
 CORS(application)
@@ -36,6 +37,13 @@ except Exception as e:
     application.logger.error(f"AWS Configuration Error: {e}")
     s3_client = None
     BUCKET_NAME = None
+
+# Check if ffmpeg is available
+try:
+    subprocess.run(['ffmpeg', '-version'], capture_output=True, check=True)
+    application.logger.info("ffmpeg is available")
+except (subprocess.SubprocessError, FileNotFoundError):
+    application.logger.warning("ffmpeg is not available, some videos may not process correctly")
 
 def sanitize_filename(filename):
     # Replace invalid characters with underscores
@@ -101,11 +109,16 @@ def download_video():
         with tempfile.TemporaryDirectory() as temp_dir:
             # Configure yt-dlp options
             ydl_opts = {
-                'format': 'best',  # Get best quality
+                'format': 'best',
                 'outtmpl': f'{temp_dir}/%(title)s.%(ext)s',
                 'quiet': True,
                 'restrictfilenames': True,
-                'progress_hooks': [lambda d: None],  # Disable progress output
+                'progress_hooks': [lambda d: None],
+                'postprocessors': [{
+                    'key': 'FFmpegVideoConvertor',
+                    'preferedformat': 'mp4',
+                }],
+                'prefer_ffmpeg': True,
             }
 
             # Create a yt-dlp object
