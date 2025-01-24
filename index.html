@@ -6,23 +6,38 @@
     <title>Video Downloader</title>
     <link rel="stylesheet" href="/static/Styles.css">
     <!-- Add Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <!-- Add Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <div class="container">
-        <h1>Video Downloader</h1>
-        <p class="size-warning">Note: Maximum video size is 500MB</p>
-        <div class="input-group">
-            <input type="text" id="videoUrl" placeholder="Enter video URL">
-            <button onclick="downloadVideo()">Download</button>
-        </div>
-        <div id="status" class="status"></div>
-        <div id="downloadLink" class="download-link"></div>
-        <div class="loading-spinner" id="loadingSpinner" style="display: none;">
-            <div class="spinner"></div>
-            <p>Processing your video...</p>
+        <div class="card">
+            <h1><i class="fas fa-download"></i> Video Downloader</h1>
+            <p class="size-warning"><i class="fas fa-exclamation-circle"></i> Maximum video size: 500MB</p>
+            
+            <div class="input-group">
+                <input type="text" id="videoUrl" placeholder="Paste video URL here...">
+                <button onclick="downloadVideo()">
+                    <i class="fas fa-arrow-down"></i> Download
+                </button>
+            </div>
+
+            <div class="progress-container" style="display: none;">
+                <div class="progress-label">Processing: <span id="progressText">0%</span></div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-status" id="progressStatus">Initializing download...</div>
+            </div>
+
+            <div id="status" class="status"></div>
+            <div id="downloadLink" class="download-link"></div>
+            
+            <div class="loading-spinner" id="loadingSpinner" style="display: none;">
+                <div class="spinner"></div>
+                <p>Processing your video...</p>
+            </div>
         </div>
     </div>
     <script src="/static/Script.js"></script>
