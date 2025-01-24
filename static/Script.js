@@ -45,8 +45,8 @@ async function downloadVideo() {
         resetUI();
         progressContainer.style.display = 'block';
         
-        // Initialize progress
-        updateProgress(20, 'Fetching video information...', progressFill, progressText, progressStatus);
+        // Start with initial progress
+        updateProgress(10, 'Initializing...', progressFill, progressText, progressStatus);
 
         const response = await fetchWithTimeout('/download', {
             method: 'POST',
@@ -56,22 +56,16 @@ async function downloadVideo() {
             body: JSON.stringify({ url: videoUrl })
         });
 
-        // Update progress after fetch completes
-        updateProgress(60, 'Processing video...', progressFill, progressText, progressStatus);
-
         const data = await response.json();
 
         if (!response.ok) {
             throw new Error(data.error || 'Failed to download video');
         }
 
-        // Update progress before creating download button
-        updateProgress(80, 'Preparing download...', progressFill, progressText, progressStatus);
-
-        // Create download button
+        // Create download button immediately when we have the URL
         createDownloadButton(data.download_url, data.title);
-
-        // Complete the progress
+        
+        // Complete the progress immediately after download link is created
         updateProgress(100, 'Download ready!', progressFill, progressText, progressStatus);
         
         // Show success message
