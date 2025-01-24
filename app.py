@@ -9,8 +9,8 @@ from botocore.exceptions import ClientError
 import tempfile
 import time
 
-app = Flask(__name__)
-CORS(app)
+application = Flask(__name__, static_folder='static')
+CORS(application)
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
@@ -28,7 +28,7 @@ try:
     # Validate AWS credentials
     s3_client.list_buckets()  # Test the connection
 except Exception as e:
-    app.logger.error(f"AWS Configuration Error: {e}")
+    application.logger.error(f"AWS Configuration Error: {e}")
     s3_client = None
     BUCKET_NAME = None
 
@@ -49,7 +49,7 @@ def upload_to_s3(file_path, object_name):
             ExpiresIn=3600)
         return url
     except ClientError as e:
-        app.logger.error(f"S3 upload error: {e}")
+        application.logger.error(f"S3 upload error: {e}")
         return None
 
 def check_file_size(file_path, max_size_mb=50):
@@ -68,7 +68,7 @@ def get_mime_type(file_ext):
     }
     return mime_types.get(file_ext.lower(), 'application/octet-stream')
 
-@app.route('/download', methods=['POST'])
+@application.route('/download', methods=['POST'])
 def download_video():
     video_url = request.json.get('url')
 
@@ -96,11 +96,11 @@ def download_video():
                 full_path = os.path.join(temp_dir, video_filename)
 
                 # Log the downloaded file
-                app.logger.debug(f"Downloaded file: {full_path}")
+                application.logger.debug(f"Downloaded file: {full_path}")
 
                 # Check if the file exists
                 if not os.path.exists(full_path):
-                    app.logger.error(f"File not found: {full_path}")
+                    application.logger.error(f"File not found: {full_path}")
                     return jsonify({"error": "File not found on server."}), 404
 
                 # Generate a unique S3 object name using timestamp
@@ -123,14 +123,14 @@ def download_video():
                 })
 
     except yt_dlp.utils.DownloadError as e:
-        app.logger.error(f"DownloadError: {e}")
+        application.logger.error(f"DownloadError: {e}")
         return jsonify({"error": "The file wasn't available on the site."}), 400
     except Exception as e:
-        app.logger.error(f"Unexpected error: {e}")
+        application.logger.error(f"Unexpected error: {e}")
         return jsonify({"error": str(e)}), 500
 
 # Add security headers (before app = app.wsgi_app)
-@app.after_request
+@application.after_request
 def add_security_headers(response):
     response.headers['X-Content-Type-Options'] = 'nosniff'
     response.headers['X-Frame-Options'] = 'DENY'
@@ -138,7 +138,7 @@ def add_security_headers(response):
     response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
     return response
 
-app = app.wsgi_app
+app = application.wsgi_app
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    application.run(debug=True)
