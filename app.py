@@ -16,20 +16,21 @@ CORS(app)
 logging.basicConfig(level=logging.DEBUG)
 
 # Configure AWS S3
-s3_client = boto3.client(
-    's3',
-    aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID'),
-    aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY'),
-    region_name=os.environ.get('AWS_REGION')
-)
-BUCKET_NAME = os.environ.get('AWS_BUCKET_NAME')
-
-# Add after AWS client initialization (around line 25)
-if not all([os.environ.get('AWS_ACCESS_KEY_ID'),
-           os.environ.get('AWS_SECRET_ACCESS_KEY'),
-           os.environ.get('AWS_REGION'),
-           os.environ.get('AWS_BUCKET_NAME')]):
-    raise ValueError("Missing required AWS environment variables")
+try:
+    s3_client = boto3.client(
+        's3',
+        aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID'),
+        aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY'),
+        region_name=os.environ.get('AWS_REGION', 'us-east-1')  # Default to us-east-1
+    )
+    BUCKET_NAME = os.environ.get('AWS_BUCKET_NAME')
+    
+    # Validate AWS credentials
+    s3_client.list_buckets()  # Test the connection
+except Exception as e:
+    app.logger.error(f"AWS Configuration Error: {e}")
+    s3_client = None
+    BUCKET_NAME = None
 
 def sanitize_filename(filename):
     # Replace invalid characters with underscores
@@ -105,6 +106,10 @@ def download_video():
                 # Generate a unique S3 object name using timestamp
                 timestamp = int(time.time())
                 s3_object_name = f"videos/{timestamp}_{video_filename}"
+
+                # Add to download_video function before the S3 upload (around line 109):
+                if not s3_client or not BUCKET_NAME:
+                    return jsonify({"error": "AWS S3 is not properly configured"}), 503
 
                 # Upload to S3 and get presigned URL
                 download_url = upload_to_s3(full_path, s3_object_name)
