@@ -68,6 +68,18 @@ def get_mime_type(file_ext):
     }
     return mime_types.get(file_ext.lower(), 'application/octet-stream')
 
+def check_video_size(url):
+    """Check video size before downloading"""
+    try:
+        with yt_dlp.YoutubeDL({'quiet': True}) as ydl:
+            info = ydl.extract_info(url, download=False)
+            filesize = info.get('filesize', 0)
+            if filesize and filesize > 500000000:  # 500MB
+                return False
+            return True
+    except:
+        return True  # If we can't check size, proceed with download
+
 @application.route('/download', methods=['POST'])
 def download_video():
     video_url = request.json.get('url')
@@ -76,14 +88,19 @@ def download_video():
         return jsonify({"error": "No URL provided"}), 400
 
     try:
+        # Check video size first
+        if not check_video_size(video_url):
+            return jsonify({"error": "Video file is too large (max 500MB)"}), 413
+
         # Create a temporary directory for downloads
         with tempfile.TemporaryDirectory() as temp_dir:
             # Configure yt-dlp options
             ydl_opts = {
-                'format': 'best',
+                'format': 'best',  # Get best quality
                 'outtmpl': f'{temp_dir}/%(title)s.%(ext)s',
                 'quiet': True,
                 'restrictfilenames': True,
+                'progress_hooks': [lambda d: None],  # Disable progress output
             }
 
             # Create a yt-dlp object

@@ -45,7 +45,7 @@ async function downloadVideo() {
 
     try {
         // Clear previous status and show loading spinner
-        statusDiv.innerHTML = '';
+        statusDiv.innerHTML = 'Initializing download...';
         downloadLinkDiv.innerHTML = '';
         loadingSpinner.style.display = 'flex';
 
@@ -65,19 +65,18 @@ async function downloadVideo() {
 
         // Hide loading spinner
         loadingSpinner.style.display = 'none';
+        statusDiv.innerHTML = 'Video processed successfully!';
+        statusDiv.className = 'status success';
 
         // Create download link
         const downloadLink = document.createElement('a');
         downloadLink.href = data.download_url;
         downloadLink.className = 'download-button';
-        downloadLink.target = '_blank'; // Open in new tab
+        downloadLink.target = '_blank';
         downloadLink.textContent = `Download ${data.title}`;
         
-        downloadLinkDiv.innerHTML = ''; // Clear previous links
+        downloadLinkDiv.innerHTML = '';
         downloadLinkDiv.appendChild(downloadLink);
-        
-        statusDiv.innerHTML = 'Video processed successfully!';
-        statusDiv.className = 'status success';
 
         // Add expiration warning
         const expirationWarning = document.createElement('p');
@@ -89,6 +88,7 @@ async function downloadVideo() {
         loadingSpinner.style.display = 'none';
         statusDiv.innerHTML = error.message || 'An error occurred while processing the video';
         statusDiv.className = 'status error';
+        console.error('Download error:', error);
     }
 }
 
