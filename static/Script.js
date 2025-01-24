@@ -45,8 +45,8 @@ async function downloadVideo() {
         resetUI();
         progressContainer.style.display = 'block';
         
-        // Start progress simulation
-        startProgressSimulation(progressFill, progressText, progressStatus);
+        // Initialize progress
+        updateProgress(20, 'Fetching video information...', progressFill, progressText, progressStatus);
 
         const response = await fetchWithTimeout('/download', {
             method: 'POST',
@@ -56,23 +56,31 @@ async function downloadVideo() {
             body: JSON.stringify({ url: videoUrl })
         });
 
+        // Update progress after fetch completes
+        updateProgress(60, 'Processing video...', progressFill, progressText, progressStatus);
+
         const data = await response.json();
 
         if (!response.ok) {
             throw new Error(data.error || 'Failed to download video');
         }
 
-        // Complete the progress bar
-        completeProgress(progressFill, progressText);
-        
-        // Show success message
-        showSuccess('Video processed successfully!');
+        // Update progress before creating download button
+        updateProgress(80, 'Preparing download...', progressFill, progressText, progressStatus);
 
         // Create download button
         createDownloadButton(data.download_url, data.title);
 
+        // Complete the progress
+        updateProgress(100, 'Download ready!', progressFill, progressText, progressStatus);
+        
+        // Show success message
+        showSuccess('Video processed successfully!');
+
     } catch (error) {
         showError(error.message);
+        // Reset progress on error
+        updateProgress(0, 'Error occurred', progressFill, progressText, progressStatus);
     }
 }
 
@@ -84,45 +92,17 @@ function resetUI() {
     statusDiv.innerHTML = '';
     statusDiv.className = 'status';
     downloadLinkDiv.innerHTML = '';
-    document.getElementById('progressFill').style.width = '0%';
-    document.getElementById('progressText').textContent = '0%';
-    document.getElementById('progressStatus').textContent = 'Initializing download...';
+    updateProgress(0, 'Initializing...', 
+        document.getElementById('progressFill'),
+        document.getElementById('progressText'),
+        document.getElementById('progressStatus')
+    );
 }
 
-function startProgressSimulation(progressFill, progressText, progressStatus) {
-    let progress = 0;
-    const statuses = [
-        { percent: 0, text: 'Initializing download...' },
-        { percent: 20, text: 'Fetching video information...' },
-        { percent: 40, text: 'Processing video...' },
-        { percent: 60, text: 'Optimizing format...' },
-        { percent: 80, text: 'Preparing download...' }
-    ];
-
-    const interval = setInterval(() => {
-        if (progress >= 90) {
-            clearInterval(interval);
-            return;
-        }
-
-        progress += 1;
-        progressFill.style.width = `${progress}%`;
-        progressText.textContent = `${progress}%`;
-
-        // Update status text based on progress
-        for (let status of statuses) {
-            if (progress === status.percent) {
-                progressStatus.textContent = status.text;
-            }
-        }
-    }, 100);
-
-    return interval;
-}
-
-function completeProgress(progressFill, progressText) {
-    progressFill.style.width = '100%';
-    progressText.textContent = '100%';
+function updateProgress(percent, status, progressFill, progressText, progressStatus) {
+    progressFill.style.width = `${percent}%`;
+    progressText.textContent = `${percent}%`;
+    progressStatus.textContent = status;
 }
 
 function showError(message) {
