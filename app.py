@@ -93,11 +93,20 @@ def upload_to_s3(file_path, object_name):
         s3_client.upload_file(file_path, BUCKET_NAME, object_name)
         application.logger.info("File uploaded successfully")
 
-        # Generate presigned URL
-        url = s3_client.generate_presigned_url('get_object',
-            Params={'Bucket': BUCKET_NAME, 'Key': object_name},
-            ExpiresIn=3600)
-        application.logger.info("Presigned URL generated successfully")
+        # Generate presigned URL with explicit configuration
+        url = s3_client.generate_presigned_url(
+            'get_object',
+            Params={
+                'Bucket': BUCKET_NAME,
+                'Key': object_name
+            },
+            ExpiresIn=3600,
+            HttpMethod='GET'
+        )
+        
+        # Log the generated URL (without query parameters)
+        base_url = url.split('?')[0]
+        application.logger.info(f"Generated base URL: {base_url}")
         
         return url
     except ClientError as e:

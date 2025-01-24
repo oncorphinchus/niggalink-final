@@ -6,12 +6,14 @@
         "AllowedMethods": [
             "GET",
             "PUT",
-            "POST",
-            "DELETE"
+            "POST"
         ],
         "AllowedOrigins": [
             "*"
         ],
-        "ExposeHeaders": []
+        "ExposeHeaders": [
+            "ETag"
+        ],
+        "MaxAgeSeconds": 3000
     }
 ] 
