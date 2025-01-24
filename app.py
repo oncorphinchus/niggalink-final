@@ -18,23 +18,42 @@ logging.basicConfig(level=logging.DEBUG)
 
 # Configure AWS S3
 try:
+    # Log environment variables (without sensitive data)
+    application.logger.info(f"AWS Region: {os.environ.get('AWS_REGION')}")
+    application.logger.info(f"AWS Bucket: {os.environ.get('AWS_BUCKET_NAME')}")
+    application.logger.info("AWS Access Key ID exists: {}".format(bool(os.environ.get('AWS_ACCESS_KEY_ID'))))
+    application.logger.info("AWS Secret Access Key exists: {}".format(bool(os.environ.get('AWS_SECRET_ACCESS_KEY'))))
+
     s3_client = boto3.client(
         's3',
         aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID'),
         aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY'),
         region_name=os.environ.get('AWS_REGION', 'us-east-1')
     )
-    # Test the connection
-    s3_client.list_buckets()
+    
+    # Test the connection and log the response
+    try:
+        response = s3_client.list_buckets()
+        application.logger.info(f"Available buckets: {[bucket['Name'] for bucket in response['Buckets']]}")
+    except Exception as bucket_error:
+        application.logger.error(f"Failed to list buckets: {str(bucket_error)}")
+        raise
+
     BUCKET_NAME = os.environ.get('AWS_BUCKET_NAME')
     if not BUCKET_NAME:
         raise ValueError("AWS_BUCKET_NAME not set")
     
-    # Verify bucket exists
-    s3_client.head_bucket(Bucket=BUCKET_NAME)
+    # Verify bucket exists and is accessible
+    try:
+        s3_client.head_bucket(Bucket=BUCKET_NAME)
+        application.logger.info(f"Successfully connected to bucket: {BUCKET_NAME}")
+    except Exception as bucket_error:
+        application.logger.error(f"Failed to access bucket {BUCKET_NAME}: {str(bucket_error)}")
+        raise
     
 except Exception as e:
     application.logger.error(f"AWS Configuration Error: {e}")
+    application.logger.error("Full AWS configuration error details:", exc_info=True)
     s3_client = None
     BUCKET_NAME = None
 
@@ -55,14 +74,39 @@ def sanitize_filename(filename):
 def upload_to_s3(file_path, object_name):
     """Upload a file to S3 bucket"""
     try:
+        if not s3_client or not BUCKET_NAME:
+            application.logger.error("S3 client or bucket name not properly initialized")
+            return None
+
+        application.logger.info(f"Attempting to upload {file_path} to {BUCKET_NAME}/{object_name}")
+        
+        # Check if file exists and is readable
+        if not os.path.exists(file_path):
+            application.logger.error(f"File not found: {file_path}")
+            return None
+            
+        # Get file size
+        file_size = os.path.getsize(file_path)
+        application.logger.info(f"File size: {file_size} bytes")
+
+        # Attempt upload
         s3_client.upload_file(file_path, BUCKET_NAME, object_name)
-        # Generate a presigned URL that expires in 1 hour
+        application.logger.info("File uploaded successfully")
+
+        # Generate presigned URL
         url = s3_client.generate_presigned_url('get_object',
             Params={'Bucket': BUCKET_NAME, 'Key': object_name},
             ExpiresIn=3600)
+        application.logger.info("Presigned URL generated successfully")
+        
         return url
     except ClientError as e:
         application.logger.error(f"S3 upload error: {e}")
+        application.logger.error("Full S3 upload error details:", exc_info=True)
+        return None
+    except Exception as e:
+        application.logger.error(f"Unexpected error during S3 upload: {e}")
+        application.logger.error("Full error details:", exc_info=True)
         return None
 
 def check_file_size(file_path, max_size_mb=50):
