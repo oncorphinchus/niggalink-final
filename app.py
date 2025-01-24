@@ -109,16 +109,14 @@ def download_video():
         with tempfile.TemporaryDirectory() as temp_dir:
             # Configure yt-dlp options
             ydl_opts = {
-                'format': 'best',
+                'format': 'best[ext=mp4]/best',  # Prefer MP4 format
                 'outtmpl': f'{temp_dir}/%(title)s.%(ext)s',
                 'quiet': True,
                 'restrictfilenames': True,
                 'progress_hooks': [lambda d: None],
-                'postprocessors': [{
-                    'key': 'FFmpegVideoConvertor',
-                    'preferedformat': 'mp4',
-                }],
-                'prefer_ffmpeg': True,
+                'no_warnings': True,
+                'extract_flat': False,
+                'format_sort': ['res:1080', 'ext:mp4:m4a']
             }
 
             # Create a yt-dlp object
