@@ -28,24 +28,16 @@ try:
         's3',
         aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID'),
         aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY'),
-        region_name='eu-north-1',
-        config=boto3.Config(
-            s3={'addressing_style': 'path'},
-            signature_version='s3v4'
-        ),
-        endpoint_url=f"https://s3.eu-north-1.amazonaws.com"
+        region_name='eu-north-1'
     )
     
-    # Test the connection
-    s3_client.list_buckets()
     BUCKET_NAME = os.environ.get('AWS_BUCKET_NAME')
-    
     if not BUCKET_NAME:
         raise ValueError("AWS_BUCKET_NAME not set")
     
-    # Verify bucket exists
-    s3_client.head_bucket(Bucket=BUCKET_NAME)
-    application.logger.info(f"Successfully connected to bucket: {BUCKET_NAME}")
+    # Test the connection
+    s3_client.list_buckets()
+    application.logger.info(f"Successfully connected to S3")
     
 except Exception as e:
     application.logger.error(f"AWS Configuration Error: {e}")
@@ -75,19 +67,17 @@ def upload_to_s3(file_path, object_name):
 
         application.logger.info(f"Attempting to upload {file_path} to {BUCKET_NAME}/{object_name}")
         
-        # Upload file
-        s3_client.upload_file(file_path, BUCKET_NAME, object_name)
+        # Upload file with public-read ACL
+        s3_client.upload_file(
+            file_path, 
+            BUCKET_NAME, 
+            object_name,
+            ExtraArgs={'ACL': 'public-read'}
+        )
         application.logger.info("File uploaded successfully")
 
-        # Generate presigned URL with explicit endpoint
-        url = s3_client.generate_presigned_url(
-            'get_object',
-            Params={
-                'Bucket': BUCKET_NAME,
-                'Key': object_name
-            },
-            ExpiresIn=3600
-        )
+        # Generate direct URL
+        url = f"https://{BUCKET_NAME}.s3.eu-north-1.amazonaws.com/{object_name}"
         
         application.logger.info(f"Generated URL: {url}")
         return url
