@@ -21,6 +21,8 @@ body {
     background-color: var(--background-color);
     min-height: 100vh;
     padding-top: var(--nav-height);
+    display: flex;
+    flex-direction: column;
 }
 
 /* Navigation */
@@ -79,6 +81,7 @@ body {
     max-width: 800px;
     margin: 40px auto;
     padding: 0 20px;
+    flex: 1;
 }
 
 .card {
@@ -167,7 +170,8 @@ body {
     padding: 20px;
     color: #666;
     background: var(--card-background);
-    margin-top: 40px;
+    margin-top: auto;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* Animations */

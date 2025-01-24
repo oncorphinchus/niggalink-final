@@ -1,3 +1,33 @@
+// Make sure this is at the top of your Script.js file
+document.addEventListener('DOMContentLoaded', () => {
+    // Add click handlers for navigation
+    document.querySelectorAll('.nav-links a').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // Remove active class from all links
+            document.querySelectorAll('.nav-links a').forEach(l => {
+                l.classList.remove('active');
+            });
+            
+            // Add active class to clicked link
+            e.target.classList.add('active');
+            
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            const tabId = e.target.getAttribute('data-tab');
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
+
+    // Initialize history display
+    updateHistoryDisplay();
+});
+
 // Utility function to sanitize HTML and prevent XSS attacks
 function escapeHtml(str) {
     if (!str) return ''; // Return empty string if input is null or undefined
