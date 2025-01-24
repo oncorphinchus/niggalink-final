@@ -6,6 +6,7 @@
     --background-color: #f5f7fa;
     --card-background: #ffffff;
     --text-color: #333333;
+    --nav-height: 60px;
 }
 
 /* General Styles */
@@ -19,10 +20,175 @@ body {
     font-family: 'Poppins', sans-serif;
     background-color: var(--background-color);
     min-height: 100vh;
+    padding-top: var(--nav-height);
+}
+
+/* Navigation */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--nav-height);
+    background: var(--card-background);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.nav-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    height: 100%;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+    padding: 0 20px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.nav-links {
+    display: flex;
+    gap: 20px;
+    list-style: none;
+}
+
+.nav-links a {
+    color: var(--text-color);
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* Container and Cards */
+.container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.card {
+    background: var(--card-background);
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    animation: slideIn 0.5s ease;
+}
+
+/* Tab Content */
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* History Styles */
+.history-list {
+    margin: 20px 0;
+}
+
+.history-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    animation: slideIn 0.3s ease;
+}
+
+.history-item:last-child {
+    border-bottom: none;
+}
+
+.history-title {
+    flex: 1;
+    margin-right: 20px;
+}
+
+.history-date {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.clear-history-btn {
+    width: 100%;
+    margin-top: 20px;
+    background-color: var(--error-color);
+}
+
+.clear-history-btn:hover {
+    background-color: #c82333;
+}
+
+/* About Styles */
+.about-content {
+    line-height: 1.6;
+}
+
+.features, .usage {
+    margin: 20px 0;
+}
+
+.features ul, .usage ol {
+    margin: 10px 0;
+    padding-left: 20px;
+}
+
+.features li, .usage li {
+    margin: 10px 0;
+}
+
+.features i {
+    color: var(--success-color);
+    margin-right: 10px;
+}
+
+/* Footer */
+.footer {
+    text-align: center;
     padding: 20px;
+    color: #666;
+    background: var(--card-background);
+    margin-top: 40px;
+}
+
+/* Animations */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 /* Hero Section */
@@ -43,12 +209,6 @@ body {
     opacity: 0.9;
 }
 
-/* Main Container */
-.container {
-    width: 100%;
-    max-width: 600px;
-}
-
 h1 {
     color: var(--text-color);
     text-align: center;
@@ -66,14 +226,6 @@ h1 i {
     color: #666;
     margin-bottom: 1.5rem;
     font-size: 0.9rem;
-}
-
-/* Card Layout */
-.card {
-    background: var(--card-background);
-    padding: 2rem;
-    border-radius: 15px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
 /* Input Group */
@@ -235,16 +387,6 @@ button:hover {
     margin-top: 10px;
 }
 
-/* Footer */
-.footer {
-    text-align: center;
-    padding: 20px;
-    background-color: #007bff;
-    color: #fff;
-    position: relative;
-    margin-top: 40px;
-}
-
 /* Loader */
 .loader {
     border: 4px solid #f3f3f3;
@@ -264,19 +406,6 @@ button:hover {
 
     100% {
         transform: rotate(360deg);
-    }
-}
-
-/* Animations */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
     }
 }
 

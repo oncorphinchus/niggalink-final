@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Video Downloader</title>
-    <link rel="icon" type="image/png" href="/static/favicon.png">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='%234a90e2' d='M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32V274.7l-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7V32zM64 352c-35.3 0-64 28.7-64 64v32c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V416c0-35.3-28.7-64-64-64H346.5l-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352H64zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z'/></svg>" type="image/svg+xml">
     <link rel="stylesheet" href="/static/Styles.css">
     <!-- Add Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
@@ -12,35 +12,100 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="logo">
+                <i class="fas fa-download"></i>
+                <span>Video Downloader</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#" class="active" data-tab="downloader">Download</a></li>
+                <li><a href="#" data-tab="history">History</a></li>
+                <li><a href="#" data-tab="about">About</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
     <div class="container">
-        <div class="card">
-            <h1><i class="fas fa-download"></i> Video Downloader</h1>
-            <p class="size-warning"><i class="fas fa-exclamation-circle"></i> Maximum video size: 500MB</p>
-            
-            <div class="input-group">
-                <input type="text" id="videoUrl" placeholder="Paste video URL here...">
-                <button onclick="downloadVideo()">
-                    <i class="fas fa-arrow-down"></i> Download
+        <!-- Downloader Tab -->
+        <div class="tab-content active" id="downloader">
+            <div class="card">
+                <h1><i class="fas fa-download"></i> Video Downloader</h1>
+                <p class="size-warning"><i class="fas fa-exclamation-circle"></i> Maximum video size: 500MB</p>
+                
+                <div class="input-group">
+                    <input type="text" id="videoUrl" placeholder="Paste video URL here...">
+                    <button onclick="downloadVideo()">
+                        <i class="fas fa-arrow-down"></i> Download
+                    </button>
+                </div>
+
+                <div class="progress-container" style="display: none;">
+                    <div class="progress-label">Processing: <span id="progressText">0%</span></div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-status" id="progressStatus">Initializing download...</div>
+                </div>
+
+                <div id="status" class="status"></div>
+                <div id="downloadLink" class="download-link"></div>
+                
+                <div class="loading-spinner" id="loadingSpinner" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Processing your video...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Tab -->
+        <div class="tab-content" id="history">
+            <div class="card">
+                <h2><i class="fas fa-history"></i> Download History</h2>
+                <div class="history-list" id="historyList">
+                    <!-- History items will be added here dynamically -->
+                </div>
+                <button onclick="clearHistory()" class="clear-history-btn">
+                    <i class="fas fa-trash"></i> Clear History
                 </button>
             </div>
+        </div>
 
-            <div class="progress-container" style="display: none;">
-                <div class="progress-label">Processing: <span id="progressText">0%</span></div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill"></div>
+        <!-- About Tab -->
+        <div class="tab-content" id="about">
+            <div class="card">
+                <h2><i class="fas fa-info-circle"></i> About</h2>
+                <div class="about-content">
+                    <p>Video Downloader is a simple, fast, and free tool to download videos from various platforms.</p>
+                    <div class="features">
+                        <h3>Features:</h3>
+                        <ul>
+                            <li><i class="fas fa-check"></i> Support for multiple platforms</li>
+                            <li><i class="fas fa-check"></i> No registration required</li>
+                            <li><i class="fas fa-check"></i> Fast downloads</li>
+                            <li><i class="fas fa-check"></i> Best quality available</li>
+                        </ul>
+                    </div>
+                    <div class="usage">
+                        <h3>How to use:</h3>
+                        <ol>
+                            <li>Copy the video URL from your browser</li>
+                            <li>Paste it in the input field</li>
+                            <li>Click Download and wait for processing</li>
+                            <li>Click the download button when ready</li>
+                        </ol>
+                    </div>
                 </div>
-                <div class="progress-status" id="progressStatus">Initializing download...</div>
-            </div>
-
-            <div id="status" class="status"></div>
-            <div id="downloadLink" class="download-link"></div>
-            
-            <div class="loading-spinner" id="loadingSpinner" style="display: none;">
-                <div class="spinner"></div>
-                <p>Processing your video...</p>
             </div>
         </div>
     </div>
+
+    <footer class="footer">
+        <p>© 2024 Video Downloader. All rights reserved.</p>
+    </footer>
+
     <script src="/static/Script.js"></script>
 </body>
 </html>
