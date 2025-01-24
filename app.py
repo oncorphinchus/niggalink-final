@@ -21,12 +21,17 @@ try:
         's3',
         aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID'),
         aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY'),
-        region_name=os.environ.get('AWS_REGION', 'us-east-1')  # Default to us-east-1
+        region_name=os.environ.get('AWS_REGION', 'us-east-1')
     )
+    # Test the connection
+    s3_client.list_buckets()
     BUCKET_NAME = os.environ.get('AWS_BUCKET_NAME')
+    if not BUCKET_NAME:
+        raise ValueError("AWS_BUCKET_NAME not set")
     
-    # Validate AWS credentials
-    s3_client.list_buckets()  # Test the connection
+    # Verify bucket exists
+    s3_client.head_bucket(Bucket=BUCKET_NAME)
+    
 except Exception as e:
     application.logger.error(f"AWS Configuration Error: {e}")
     s3_client = None
