@@ -67,12 +67,11 @@ def upload_to_s3(file_path, object_name):
 
         application.logger.info(f"Attempting to upload {file_path} to {BUCKET_NAME}/{object_name}")
         
-        # Upload file with public-read ACL
+        # Upload file without ACL
         s3_client.upload_file(
             file_path, 
             BUCKET_NAME, 
-            object_name,
-            ExtraArgs={'ACL': 'public-read'}
+            object_name
         )
         application.logger.info("File uploaded successfully")
 
