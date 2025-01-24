@@ -39,6 +39,34 @@ try:
     s3_client.list_buckets()
     application.logger.info(f"Successfully connected to S3")
     
+    def configure_s3_lifecycle():
+        """Configure S3 bucket lifecycle rule to delete objects older than 1 hour"""
+        try:
+            s3_client.put_bucket_lifecycle_configuration(
+                Bucket=BUCKET_NAME,
+                LifecycleConfiguration={
+                    'Rules': [
+                        {
+                            'ID': 'DeleteOldFiles',
+                            'Status': 'Enabled',
+                            'Filter': {
+                                'Prefix': 'videos/'
+                            },
+                            'Expiration': {
+                                'Days': 1
+                            }
+                        }
+                    ]
+                }
+            )
+            application.logger.info("Successfully configured S3 lifecycle rule")
+        except Exception as e:
+            application.logger.error(f"Failed to configure S3 lifecycle: {e}")
+    
+    # After successful S3 connection
+    if s3_client and BUCKET_NAME:
+        configure_s3_lifecycle()
+    
 except Exception as e:
     application.logger.error(f"AWS Configuration Error: {e}")
     s3_client = None
@@ -113,8 +141,30 @@ def check_video_size(url):
     except:
         return True  # If we can't check size, proceed with download
 
+def cleanup_old_files():
+    """Delete files older than 1 hour"""
+    try:
+        one_hour_ago = int(time.time() - 3600)
+        response = s3_client.list_objects_v2(Bucket=BUCKET_NAME, Prefix='videos/')
+        
+        if 'Contents' in response:
+            for obj in response['Contents']:
+                # Extract timestamp from filename (format: videos/timestamp_filename)
+                try:
+                    timestamp = int(obj['Key'].split('/')[1].split('_')[0])
+                    if timestamp < one_hour_ago:
+                        s3_client.delete_object(Bucket=BUCKET_NAME, Key=obj['Key'])
+                        application.logger.info(f"Deleted old file: {obj['Key']}")
+                except (IndexError, ValueError):
+                    continue
+                    
+    except Exception as e:
+        application.logger.error(f"Cleanup error: {e}")
+
 @application.route('/download', methods=['POST'])
 def download_video():
+    # Run cleanup before processing new download
+    cleanup_old_files()
     video_url = request.json.get('url')
 
     if not video_url:
