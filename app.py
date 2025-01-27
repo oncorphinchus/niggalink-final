@@ -13,8 +13,8 @@ import time
 import subprocess
 
 application = Flask(__name__, static_folder='static')
-application.secret_key = os.environ.get('FLASK_SECRET_KEY', 'your-secret-key')  # Change this!
-CORS(application)
+application.secret_key = os.environ.get('FLASK_SECRET_KEY')  # Change this!
+CORS(application, supports_credentials=True)
 
 # Initialize Flask-Login
 login_manager = LoginManager()

@@ -2,7 +2,9 @@ async function checkAuth() {
     // Only check if we're not already on the login page
     if (window.location.pathname !== '/login.html') {
         try {
-            const response = await fetch('/api/check-auth');
+            const response = await fetch('/api/check-auth', {
+                credentials: 'include'
+            });
             const data = await response.json();
             if (!data.authenticated) {
                 window.location.href = '/login.html';
@@ -25,6 +27,7 @@ async function login() {
             headers: {
                 'Content-Type': 'application/json',
             },
+            credentials: 'include',
             body: JSON.stringify({ username, password })
         });
 
@@ -52,6 +55,7 @@ async function register() {
             headers: {
                 'Content-Type': 'application/json',
             },
+            credentials: 'include',
             body: JSON.stringify({ username, password })
         });
 
@@ -106,14 +110,17 @@ async function logout() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-            }
+            },
+            credentials: 'include'  // Important for session cookies
         });
 
         if (response.ok) {
             window.location.href = '/login.html';
+        } else {
+            console.error('Logout failed');
         }
     } catch (error) {
-        console.error('Logout failed:', error);
+        console.error('Logout error:', error);
     }
 }
 
