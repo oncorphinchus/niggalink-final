@@ -135,6 +135,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add click handlers for navigation
     document.querySelectorAll('.nav-links a').forEach(link => {
         link.addEventListener('click', (e) => {
+            const tabId = e.target.getAttribute('data-tab');
+            if (!tabId) return; // Skip if no tab ID (like for logout)
+            
             e.preventDefault();
             
             // Remove active class from all links
@@ -151,7 +154,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             
             // Show selected tab content
-            const tabId = e.target.getAttribute('data-tab');
             document.getElementById(tabId).classList.add('active');
         });
     });
