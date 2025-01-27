@@ -234,21 +234,36 @@ h1 i {
 
 /* Input Group */
 .input-group {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 1.5rem;
+    position: relative;
+    margin-bottom: 1rem;
 }
 
-input[type="text"] {
-    flex: 1;
-    padding: 12px 15px;
-    border: 2px solid #e1e1e1;
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
     border-radius: 8px;
     font-size: 1rem;
     transition: border-color 0.3s ease;
 }
 
-input[type="text"]:focus {
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: #666;
+}
+
+.password-toggle:hover {
+    color: var(--primary-color);
+}
+
+.input-group input:focus {
     border-color: var(--primary-color);
     outline: none;
 }

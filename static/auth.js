@@ -82,6 +82,9 @@ function showRegister() {
         </div>
         <div class="input-group">
             <input type="password" id="password" placeholder="Password">
+            <button type="button" class="password-toggle" onclick="togglePassword()">
+                <i class="fas fa-eye"></i>
+            </button>
         </div>
         <button onclick="register()">Register</button>
         <p class="auth-switch">Already have an account? <a href="#" onclick="showLogin()">Login</a></p>
@@ -98,10 +101,26 @@ function showLogin() {
         </div>
         <div class="input-group">
             <input type="password" id="password" placeholder="Password">
+            <button type="button" class="password-toggle" onclick="togglePassword()">
+                <i class="fas fa-eye"></i>
+            </button>
         </div>
         <button onclick="login()">Login</button>
         <p class="auth-switch">Don't have an account? <a href="#" onclick="showRegister()">Register</a></p>
     `;
+}
+
+function togglePassword() {
+    const passwordInput = document.getElementById('password');
+    const icon = document.querySelector('.password-toggle i');
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        icon.className = 'fas fa-eye-slash';
+    } else {
+        passwordInput.type = 'password';
+        icon.className = 'fas fa-eye';
+    }
 }
 
 async function logout() {
