@@ -424,3 +424,30 @@ button:hover {
         justify-content: center;
     }
 }
+
+.auth-form {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.auth-form .input-group {
+    margin-bottom: 1rem;
+}
+
+.auth-form input {
+    width: 100%;
+}
+
+.auth-switch {
+    text-align: center;
+    margin-top: 1rem;
+}
+
+.auth-switch a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.auth-switch a:hover {
+    text-decoration: underline;
+}

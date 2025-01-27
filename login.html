@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Video Downloader</title>
+    <link rel="stylesheet" href="/static/Styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1><i class="fas fa-user"></i> Login</h1>
+            <div class="auth-form">
+                <div class="input-group">
+                    <input type="text" id="username" placeholder="Username">
+                </div>
+                <div class="input-group">
+                    <input type="password" id="password" placeholder="Password">
+                </div>
+                <button onclick="login()">Login</button>
+                <p class="auth-switch">Don't have an account? <a href="#" onclick="showRegister()">Register</a></p>
+            </div>
+            <div id="auth-status" class="status"></div>
+        </div>
+    </div>
+    <script src="/static/auth.js"></script>
+</body>
+</html>

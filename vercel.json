@@ -30,6 +30,10 @@
       {
         "src": "/(.*)",
         "dest": "app.py"
+      },
+      {
+        "src": "/login",
+        "dest": "/login.html"
       }
     ]
   }

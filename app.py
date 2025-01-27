@@ -1,5 +1,7 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, redirect, url_for
 from flask_cors import CORS
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from user_management import User
 import yt_dlp
 import os
 import re
@@ -11,7 +13,58 @@ import time
 import subprocess
 
 application = Flask(__name__, static_folder='static')
+application.secret_key = os.environ.get('FLASK_SECRET_KEY', 'your-secret-key')  # Change this!
 CORS(application)
+
+# Initialize Flask-Login
+login_manager = LoginManager()
+login_manager.init_app(application)
+login_manager.login_view = 'login'
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.get(user_id)
+
+@application.route('/api/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+    
+    if not username or not password:
+        return jsonify({'error': 'Missing username or password'}), 400
+    
+    user = User.create(username, password)
+    if user:
+        login_user(user)
+        return jsonify({'message': 'Registration successful', 'username': username})
+    else:
+        return jsonify({'error': 'Username already exists'}), 400
+
+@application.route('/api/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+    
+    user = User.get_by_username(username)
+    if user and user.check_password(password):
+        login_user(user)
+        return jsonify({'message': 'Login successful', 'username': username})
+    else:
+        return jsonify({'error': 'Invalid username or password'}), 401
+
+@application.route('/api/logout', methods=['POST'])
+@login_required
+def logout():
+    logout_user()
+    return jsonify({'message': 'Logout successful'})
+
+@application.route('/api/check-auth', methods=['GET'])
+def check_auth():
+    if current_user.is_authenticated:
+        return jsonify({'authenticated': True, 'username': current_user.username})
+    return jsonify({'authenticated': False})
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
@@ -162,6 +215,7 @@ def cleanup_old_files():
         application.logger.error(f"Cleanup error: {e}")
 
 @application.route('/download', methods=['POST'])
+@login_required
 def download_video():
     # Run cleanup before processing new download
     cleanup_old_files()
