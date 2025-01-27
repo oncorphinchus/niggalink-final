@@ -14,7 +14,7 @@
         "use": "@vercel/static"
       },
       {
-        "src": "index.html",
+        "src": "*.html",
         "use": "@vercel/static"
       }
     ],
@@ -24,16 +24,16 @@
         "dest": "/static/$1"
       },
       {
+        "src": "/login",
+        "dest": "/login.html"
+      },
+      {
         "src": "/",
-        "dest": "/index.html"
+        "dest": "/app.py"
       },
       {
         "src": "/(.*)",
         "dest": "app.py"
-      },
-      {
-        "src": "/login",
-        "dest": "/login.html"
       }
     ]
   }

@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, redirect, url_for
+from flask import Flask, request, jsonify, redirect, url_for, send_file
 from flask_cors import CORS
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from user_management import User
@@ -25,6 +25,12 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return User.get(user_id)
 
+@application.route('/')
+def index():
+    if not current_user.is_authenticated:
+        return redirect('/login')
+    return send_file('index.html')
+
 @application.route('/api/register', methods=['POST'])
 def register():
     data = request.get_json()
@@ -41,8 +47,13 @@ def register():
     else:
         return jsonify({'error': 'Username already exists'}), 400
 
-@application.route('/api/login', methods=['POST'])
+@application.route('/login', methods=['GET', 'POST'])
 def login():
+    if request.method == 'GET':
+        if current_user.is_authenticated:
+            return redirect('/')
+        return send_file('login.html')
+    
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
