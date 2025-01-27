@@ -64,6 +64,19 @@ def check_auth():
         return jsonify({'authenticated': True, 'username': current_user.username})
     return jsonify({'authenticated': False})
 
+@application.route('/api/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+    
+    user = User.get_by_username(username)
+    if user and user.check_password(password):
+        login_user(user)
+        return jsonify({'message': 'Login successful', 'username': username})
+    else:
+        return jsonify({'error': 'Invalid username or password'}), 401
+
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
 

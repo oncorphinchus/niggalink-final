@@ -18,11 +18,11 @@
                 const response = await fetch('/api/check-auth');
                 const data = await response.json();
                 if (!data.authenticated) {
-                    window.location.href = '/login';
+                    window.location.href = '/login.html';
                 }
             } catch (error) {
                 console.error('Auth check failed:', error);
-                window.location.href = '/login';
+                window.location.href = '/login.html';
             }
         })();
     </script>
@@ -37,6 +37,7 @@
                 <li><a href="#" class="active" data-tab="downloader">Download</a></li>
                 <li><a href="#" data-tab="history">History</a></li>
                 <li><a href="#" data-tab="about">About</a></li>
+                <li><a href="#" onclick="logout()">Logout</a></li>
             </ul>
         </div>
     </nav>

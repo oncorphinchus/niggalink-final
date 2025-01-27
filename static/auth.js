@@ -1,13 +1,16 @@
 async function checkAuth() {
-    try {
-        const response = await fetch('/api/check-auth');
-        const data = await response.json();
-        if (!data.authenticated) {
+    // Only check if we're not already on the login page
+    if (window.location.pathname !== '/login.html') {
+        try {
+            const response = await fetch('/api/check-auth');
+            const data = await response.json();
+            if (!data.authenticated) {
+                window.location.href = '/login.html';
+            }
+        } catch (error) {
+            console.error('Auth check failed:', error);
             window.location.href = '/login.html';
         }
-    } catch (error) {
-        console.error('Auth check failed:', error);
-        window.location.href = '/login.html';
     }
 }
 
@@ -95,6 +98,23 @@ function showLogin() {
         <button onclick="login()">Login</button>
         <p class="auth-switch">Don't have an account? <a href="#" onclick="showRegister()">Register</a></p>
     `;
+}
+
+async function logout() {
+    try {
+        const response = await fetch('/api/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (response.ok) {
+            window.location.href = '/login.html';
+        }
+    } catch (error) {
+        console.error('Logout failed:', error);
+    }
 }
 
 // Add auth check to Script.js
