@@ -47,23 +47,10 @@ def register():
     else:
         return jsonify({'error': 'Username already exists'}), 400
 
-@application.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'GET':
-        if current_user.is_authenticated:
-            return redirect('/')
-        return send_file('login.html')
-    
-    data = request.get_json()
-    username = data.get('username')
-    password = data.get('password')
-    
-    user = User.get_by_username(username)
-    if user and user.check_password(password):
-        login_user(user)
-        return jsonify({'message': 'Login successful', 'username': username})
-    else:
-        return jsonify({'error': 'Invalid username or password'}), 401
+@application.route('/login.html')
+@application.route('/login')
+def serve_login():
+    return send_file('login.html')
 
 @application.route('/api/logout', methods=['POST'])
 @login_required
