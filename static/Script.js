@@ -65,12 +65,16 @@ async function downloadVideo() {
 
         // Create download button immediately when we have the URL
         createDownloadButton(data.download_url, data.title);
+        addToHistory(data.title);
         
         // Complete the progress immediately after download link is created
         updateProgress(100, 'Download ready!', progressFill, progressText, progressStatus);
         
         // Show success message
         showSuccess('Video processed successfully!');
+
+        // Add to history
+        addToHistory(data.title);
 
     } catch (error) {
         showError(error.message);
@@ -161,3 +165,56 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize history display
     updateHistoryDisplay();
 });
+
+function updateHistoryDisplay() {
+    const historyList = document.getElementById('historyList');
+    const history = getDownloadHistory();
+    
+    if (!historyList) return;
+    
+    if (history.length === 0) {
+        historyList.innerHTML = '<p class="no-history">No download history yet</p>';
+        return;
+    }
+    
+    historyList.innerHTML = history.map(item => `
+        <div class="history-item">
+            <div class="history-title">${escapeHtml(item.title)}</div>
+            <div class="history-date">${new Date(item.date).toLocaleString()}</div>
+        </div>
+    `).join('');
+}
+
+function getDownloadHistory() {
+    try {
+        return JSON.parse(localStorage.getItem('downloadHistory') || '[]');
+    } catch (e) {
+        console.error('Error reading history:', e);
+        return [];
+    }
+}
+
+function addToHistory(title) {
+    try {
+        const history = getDownloadHistory();
+        history.unshift({
+            title: title,
+            date: new Date().toISOString()
+        });
+        // Keep only last 10 items
+        const trimmedHistory = history.slice(0, 10);
+        localStorage.setItem('downloadHistory', JSON.stringify(trimmedHistory));
+        updateHistoryDisplay();
+    } catch (e) {
+        console.error('Error saving to history:', e);
+    }
+}
+
+function clearHistory() {
+    try {
+        localStorage.removeItem('downloadHistory');
+        updateHistoryDisplay();
+    } catch (e) {
+        console.error('Error clearing history:', e);
+    }
+}
